@@ -313,7 +313,6 @@
             <button class="candy-btn" id="decodeBtn">✨ Розшифрувати!</button>
             <div id="decodingResult" style="margin-top:20px; text-align:center; font-size:1.5rem; font-weight:bold;"></div>
         </div>
-        <button id="showCertBtn" class="candy-btn" style="display:none; margin-top:20px;">🎉 Отримати сертифікат</button>
     </div>
 
     <!-- ЕКРАН 4: СЕРТИФІКАТ + НАГОРОДА -->
@@ -533,31 +532,33 @@
         showScreen(3);
     });
 
-    // КНОПКА ДЕШИФРУВАННЯ (працює)
+    // ГОЛОВНА КНОПКА ДЕШИФРУВАННЯ - ОДРАЗУ ПЕРЕХОДИТЬ ДО НАГОРОДИ
     const decodeBtn = document.getElementById('decodeBtn');
     if (decodeBtn) {
         decodeBtn.addEventListener('click', function(e) {
             e.preventDefault();
             let inputField = document.getElementById('codeInput');
             let code = inputField.value.trim().toUpperCase();
-            // Якщо випадково ввели "ЗЕМЛЯ" – все добре, але захист від зайвих символів
+            
             if (code !== FINAL_CODE) {
                 showToast(`Неправильний код! Ти зібрав: ${game.collected.join('')}. Потрібно: З, Е, М, Л, Я → слово ЗЕМЛЯ`, false);
                 return;
             }
+            
+            // Успіх! Показуємо нагороду відразу
             canvasConfetti({ particleCount: 250, spread: 80, origin: { y: 0.6 } });
             document.getElementById('decodingResult').innerHTML = `🔓 Розшифровано! Секретне слово: <span style="color:#b45116;">${SECRET_WORD}</span> 🎉`;
-            document.getElementById('showCertBtn').style.display = 'block';
             game.decoderUnlocked = true;
             saveGame();
-            showToast("Код правильний! Ти отримав секретне слово!", true);
+            showToast("Код правильний! Отримуй нагороду!", true);
+            
+            // Перехід на екран сертифіката з конфетті
+            setTimeout(() => {
+                showScreen(4);
+                canvasConfetti({ particleCount: 300, spread: 100, origin: { y: 0.5 } });
+            }, 500);
         });
     }
-
-    document.getElementById('showCertBtn')?.addEventListener('click', () => {
-        showScreen(4);
-        canvasConfetti({ particleCount: 300, spread: 100, origin: { y: 0.5 } });
-    });
 
     document.getElementById('downloadPNG')?.addEventListener('click', () => {
         let element = document.getElementById('certificateBox');
@@ -576,7 +577,7 @@
         localStorage.removeItem('earthAgentGame');
     });
 
-    // Свайп-панель: внутрішня будова Землі (кора, мантія, ядро)
+    // Свайп-панель: внутрішня будова Землі
     function addSwipeEarth() {
         let swipeHtml = `
             <div class="swipe-card">
