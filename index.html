@@ -13,6 +13,7 @@
             --primary: #ffb347;
             --dark-blue: #1f4e6e;
             --bg-light: #fff8e1;
+            --accent-green: #70b85e;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -38,12 +39,13 @@
             position: relative;
         }
 
-        /* Адаптація під маленькі екрани (iPhone SE) */
+        /* Адаптація під маленькі екрани */
         @media (max-height: 700px) {
             .game-header { padding: 10px !important; }
             .game-title { font-size: 1.2rem !important; }
             .worm-mascot { transform: scale(0.8); margin-bottom: 5px !important; }
-            .mission-icon { font-size: 2rem !important; }
+            .mission-card { padding: 10px !important; }
+            .mission-card div:first-child { font-size: 1.5rem !important; }
         }
 
         .game-header {
@@ -105,6 +107,7 @@
             cursor: pointer;
             box-shadow: 0 5px 0 #a65311;
             margin-top: 10px;
+            transition: all 0.1s;
         }
 
         .candy-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 #a65311; }
@@ -144,7 +147,7 @@
             border-radius: 20px;
             border: 2px solid var(--primary);
             text-align: center;
-            font-size: 1rem;
+            font-size: 1.1rem;
             margin: 10px 0;
             font-family: inherit;
         }
@@ -155,6 +158,18 @@
             padding: 20px;
             border-radius: 20px;
             text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stamp-icon {
+            position: absolute;
+            right: 10px;
+            bottom: 10px;
+            opacity: 0.1;
+            transform: rotate(-20deg);
+            font-size: 4rem;
+            color: var(--dark-blue);
         }
     </style>
 </head>
@@ -177,48 +192,66 @@
     </div>
 
     <div id="screen1" class="screen active">
-        <input type="text" id="playerName" placeholder="Назва команди..." maxlength="15">
+        <p style="text-align:center; margin-bottom:10px; font-weight:600;">Вітаємо в експедиції!</p>
+        <input type="text" id="playerName" placeholder="Назва команди або ім'я..." maxlength="15">
         <button class="candy-btn" id="startBtn">РОЗПОЧАТИ (5 хв)</button>
-        <p style="text-align:center; font-size:0.8rem; margin-top:10px; color:#666;">Будь уважним, час пішов!</p>
+        <p style="text-align:center; font-size:0.8rem; margin-top:10px; color:#666;">Місія завершиться через 300 секунд</p>
     </div>
 
     <div id="screen2" class="screen">
         <div style="display:flex; justify-content: space-between; font-weight:bold; margin-bottom:10px;">
-            <span>⭐: <span id="score">0</span></span>
-            <span id="timer" style="color:red;">05:00</span>
+            <span>⭐ Бали: <span id="score">0</span></span>
+            <span id="timer" style="color:red; background:#ffebeb; padding:2px 8px; border-radius:10px;">05:00</span>
         </div>
         <div class="code-display" id="codeView">_____</div>
         <div class="missions-grid" id="missionsGrid"></div>
-        <button id="toDecoder" class="candy-btn" style="display:none; background: #70b85e; box-shadow: 0 5px 0 #3e6b2f;">🔓 ВІДКРИТИ ДЕШИФРАТОР</button>
+        <button id="toDecoder" class="candy-btn" style="display:none; background: var(--accent-green); box-shadow: 0 5px 0 #3e6b2f;">🔓 ВІДКРИТИ ДЕШИФРАТОР</button>
     </div>
 
     <div id="screen3" class="screen">
         <div class="certificate">
             <h3>ВВЕДИ СЕКРЕТНЕ СЛОВО</h3>
-            <p style="font-size:0.8rem;">Підказка: Збирай літери в місіях</p>
+            <p style="font-size:0.8rem; margin:10px 0;">Використай зібрані літери!</p>
             <input type="text" id="finalWordInput" placeholder="??????" style="font-size:1.5rem; letter-spacing:5px;">
-            <button class="candy-btn" id="checkFinalBtn">ПЕРЕВІРИТИ</button>
+            <button class="candy-btn" id="checkFinalBtn">ПЕРЕВІРИТИ КОД</button>
         </div>
     </div>
 
     <div id="screen4" class="screen">
         <div class="certificate" id="certBox">
+            <div class="stamp-icon"><i class="fas fa-stamp"></i></div>
+            
             <i class="fas fa-award" style="font-size: 3rem; color:var(--primary);"></i>
-            <h2 style="margin:10px 0;">СЕРТИФІКАТ АГЕНТА</h2>
-            <p>Герой: <strong id="outName"></strong></p>
-            <p style="font-size:0.8rem; margin-top:10px;">Експедиція "Надра Землі" завершена успішно!</p>
+            <h2 style="margin:10px 0; color: var(--dark-blue); font-size: 1.4rem;">СЕРТИФІКАТ АГЕНТА</h2>
+            
+            <div style="margin: 15px 0; border-top: 1px solid #eee; border-bottom: 1px solid #eee; padding: 10px 0;">
+                <p style="font-size: 0.8rem;">Цей документ підтверджує, що</p>
+                <p style="font-size: 1.2rem; color: #a65311; font-weight: 800; margin: 5px 0;" id="outName"></p>
+                <p style="font-size: 0.8rem;">став(ла) кращим дослідником надр!</p>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; text-align: left; font-size: 0.7rem; color: #666; margin-top: 10px;">
+                <div>
+                    <div>📅 Дата: <span id="certDate" style="font-weight:600;"></span></div>
+                    <div>⏰ Час: <span id="certTime" style="font-weight:600;"></span></div>
+                </div>
+                <div style="text-align: right;">
+                    <div id="certID" style="font-family:monospace;"></div>
+                    <div style="font-style:italic;">Місія: Надра Землі</div>
+                </div>
+            </div>
         </div>
-        <button class="candy-btn" id="saveCert" style="background:#4a90e2; box-shadow:0 5px 0 #2a6dbd;">ЗБЕРЕГТИ ФОТО</button>
-        <button class="candy-btn" onclick="location.reload()" style="background:#999; box-shadow:0 5px 0 #666;">ЗАВЕРШИТИ</button>
+        <button class="candy-btn" id="saveCert" style="background:#4a90e2; box-shadow:0 5px 0 #2a6dbd;">📸 ЗБЕРЕГТИ СЕРТИФІКАТ</button>
+        <button class="candy-btn" onclick="location.reload()" style="background:#999; box-shadow:0 5px 0 #666;">🏁 ЗАВЕРШИТИ УРОК</button>
     </div>
 </div>
 
-<div id="missionModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:100; padding:20px; align-items:center; justify-content:center;">
-    <div style="background:white; padding:20px; border-radius:30px; max-width:400px; width:100%;">
-        <h3 id="mTitle"></h3>
-        <p id="mTheory" style="font-size:0.9rem; margin:15px 0; line-height:1.4; background:#f9f9f9; padding:10px; border-radius:15px;"></p>
+<div id="missionModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:100; padding:20px; align-items:center; justify-content:center;">
+    <div style="background:white; padding:20px; border-radius:30px; max-width:400px; width:100%; position:relative;">
+        <h3 id="mTitle" style="color:var(--dark-blue);"></h3>
+        <p id="mTheory" style="font-size:0.95rem; margin:15px 0; line-height:1.4; background:#fdf8e6; padding:15px; border-radius:15px; border-left:4px solid var(--primary);"></p>
         <div id="mOptions"></div>
-        <button onclick="closeModal()" style="margin-top:15px; background:none; border:none; color:#999; width:100%;">Закрити</button>
+        <button onclick="closeModal()" style="margin-top:15px; background:none; border:none; color:#bbb; width:100%; font-weight:bold;">ЗАКРИТИ</button>
     </div>
 </div>
 
@@ -240,9 +273,9 @@
         timerActive: false
     };
 
-    // Оптимізація батареї: зупинка таймера, якщо вкладка неактивна
+    // Оптимізація батареї
     document.addEventListener("visibilitychange", () => {
-        state.timerActive = !document.hidden;
+        if(state.timerActive) state.timerActive = !document.hidden;
     });
 
     function showScreen(n) {
@@ -255,7 +288,7 @@
 
     document.getElementById('startBtn').onclick = () => {
         const val = document.getElementById('playerName').value.trim();
-        if(val.length < 2) return alert("Введи ім'я команди!");
+        if(val.length < 2) return alert("Будь ласка, введи ім'я!");
         state.name = val;
         startTimer();
         renderMissions();
@@ -265,17 +298,17 @@
     function startTimer() {
         state.timerActive = true;
         const interval = setInterval(() => {
-            if(!state.timerActive) return;
+            if(!state.timerActive && state.timeLeft > 0) return;
+            if(state.timeLeft <= 0) {
+                clearInterval(interval);
+                alert("Час вийшов! Спробуй швидше.");
+                location.reload();
+                return;
+            }
             state.timeLeft--;
             let m = Math.floor(state.timeLeft / 60);
             let s = state.timeLeft % 60;
             document.getElementById('timer').innerText = `${m}:${s < 10 ? '0'+s : s}`;
-            
-            if(state.timeLeft <= 0) {
-                clearInterval(interval);
-                alert("Час вичерпано! Спробуй ще раз.");
-                location.reload();
-            }
         }, 1000);
     }
 
@@ -302,20 +335,21 @@
         m.o.forEach((o, i) => {
             const btn = document.createElement('button');
             btn.className = 'candy-btn';
-            btn.style.fontSize = '0.9rem';
+            btn.style.fontSize = '0.95rem';
             btn.innerText = o;
             btn.onclick = () => {
                 if(i === m.c) {
                     state.completed[idx] = true;
                     state.letters[idx] = m.l;
-                    state.score += 10;
+                    state.score += 20;
                     document.getElementById('score').innerText = state.score;
                     closeModal();
                     renderMissions();
-                    canvasConfetti({ particleCount: 50, spread: 60 });
+                    canvasConfetti({ particleCount: 40, spread: 50, origin: { y: 0.8 } });
                 } else {
-                    btn.style.background = '#ff4d4d';
-                    setTimeout(() => btn.style.background = '', 500);
+                    btn.style.background = 'linear-gradient(135deg, #ff4d4d, #b30000)';
+                    btn.style.boxShadow = '0 5px 0 #660000';
+                    setTimeout(() => { btn.style.background = ''; btn.style.boxShadow = ''; }, 500);
                 }
             };
             opts.appendChild(btn);
@@ -328,33 +362,39 @@
     document.getElementById('toDecoder').onclick = () => showScreen(3);
 
     document.getElementById('checkFinalBtn').onclick = () => {
-        // Автозаміна латиниці на кирилицю (захист від помилок розкладки)
         let val = document.getElementById('finalWordInput').value.trim().toUpperCase()
             .replace(/E/g, 'Е').replace(/M/g, 'М').replace(/A/g, 'А');
             
         if(val === "ЗЕМЛЯ") {
             state.timerActive = false;
-            document.getElementById('outName').innerText = state.name;
+            
+            // Дата та Час
+            const now = new Date();
+            document.getElementById('outName').innerText = state.name.toUpperCase();
+            document.getElementById('certDate').innerText = now.toLocaleDateString('uk-UA');
+            document.getElementById('certTime').innerText = now.toLocaleTimeString('uk-UA', {hour: '2-digit', minute:'2-digit'});
+            document.getElementById('certID').innerText = 'ID: ' + Math.random().toString(36).substr(2, 6).toUpperCase();
+            
             showScreen(4);
-            canvasConfetti({ particleCount: 200, spread: 100 });
+            canvasConfetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
         } else {
-            alert("Спробуй ще раз! Підказка: Назва нашої планети.");
+            alert("Слово невірне! Підказка: На чому ми живемо?");
         }
     };
 
     document.getElementById('saveCert').onclick = () => {
         const btn = document.getElementById('saveCert');
-        btn.innerText = "Зачекайте...";
+        btn.innerText = "ГЕНЕРУЄМ...";
         html2canvas(document.getElementById('certBox'), {
-            scale: 2,
+            scale: 3,
             backgroundColor: "#fef9e6",
             useCORS: true
         }).then(canvas => {
             const link = document.createElement('a');
-            link.download = `Agent_Earth_${state.name}.png`;
-            link.href = canvas.toDataURL();
+            link.download = `Sertyfikat_${state.name}.png`;
+            link.href = canvas.toDataURL("image/png");
             link.click();
-            btn.innerText = "ЗБЕРЕГТИ ФОТО";
+            btn.innerText = "📸 ЗБЕРЕГТИ СЕРТИФІКАТ";
         });
     };
 </script>
